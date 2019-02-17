@@ -1,5 +1,11 @@
-$body-color: blue;
 
 body {
-  color: $body-color;
+background-color:  black;
+  display: flex;
+  // justify-content: center;
+
+}
+
+#canv {
+margin: 10rem;
 }
