@@ -62,7 +62,6 @@ var downloadAsSVG = function(fileName) {
   link.href = url;
   link.click();
 };
-
 const getRandomElement = arr => arr[getRandomInt(0, arr.length - 1)];
 const remapNumbers = (value, sourceRange, targetRange) => {
   let oldRange = sourceRange[1] - sourceRange[0];
