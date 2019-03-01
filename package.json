@@ -48,6 +48,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
     "d3": "^5.9.1",
+    "gifencoder": "^2.0.1",
     "kolorwheel": "^0.2.1",
     "paper": "^0.12.0"
   }

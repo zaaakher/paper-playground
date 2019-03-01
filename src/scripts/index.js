@@ -11,15 +11,118 @@ canv.setAttribute("height", h);
 
 Paper.setup(canv);
 let bg = new Paper.Path.Rectangle(new Paper.Point(0, 0), new Paper.Size(w, h));
-bg.fillColor = "lightblue";
+bg.fillColor = "black";
 // bg.fillColor = new Kolor([
 //   getRandomInt(0, 100),
 //   getRandomInt(0, 100),
 //   getRandomInt(0, 100)
 // ]).getHex();
-
 let ref = Paper.project.view;
 
+const rotatedSmoothedPoly = ref => {
+  let poly = new Paper.Path.RegularPolygon(ref.center, 3, 200);
+  poly.strokeWidth = 2;
+  poly.strokeColor = "white";
+  poly.smooth();
+  for (let i = 0; i < 5; i++) {
+    let copyPoly = poly.clone();
+    copyPoly.rotate(getRandomInt(20, 300) * i);
+  }
+};
+const dashedCircles = ref => {
+  for (let i = 0; i < 10; i++) {
+    let cir = new Paper.Path.Circle({
+      center: ref.center,
+      radius: 50 * i,
+      strokeColor: "white",
+      strokeWidth: 55,
+      dashArray: [
+        getRandomInt(0, 100),
+        getRandomInt(0, 100),
+        getRandomInt(0, 100),
+        getRandomInt(0, 100),
+        getRandomInt(0, 100),
+        getRandomInt(0, 100),
+        getRandomInt(0, 100),
+        getRandomInt(0, 100),
+        getRandomInt(0, 100)
+      ]
+    });
+    let rot = getRandomArbitrary(-0.5, 0.5);
+    cir.onFrame = function() {
+      this.rotate(rot);
+    };
+  }
+};
+const wavyLines = ref => {
+  // let circlesGroup = new Paper.Group();
+  let rect = new Paper.Path.Rectangle(
+    new Paper.Point(0, 0),
+    new Paper.Size(100, 1100)
+  );
+  rect.fillColor = "blue";
+  rect.bounds.center.set(ref.center);
+  let line = new Paper.Path([
+    new Paper.Point(rect.bounds.topCenter.x, rect.bounds.topCenter.y),
+    new Paper.Point(rect.bounds.bottomCenter.x, rect.bounds.bottomCenter.y)
+  ]);
+  line.strokeColor = "red";
+  line.strokeWidth = 30;
+  let anchors = [];
+  for (let i = 0; i <= 10; i++) {
+    let pt = line.getPointAt((line.length / 10) * i);
+    pt.x += getRandomInt(-50, 50);
+    let cir = new Paper.Path.Circle({
+      center: pt,
+      radius: 10,
+      fillColor: "yellow"
+    });
+    anchors.push(pt);
+    cir.remove();
+    // circlesGroup.addChild(cir);
+  }
+  line.remove();
+  rect.remove();
+  let wave = new Paper.Path(anchors);
+  wave.strokeColor = "white";
+  wave.strokeWidth = 10;
+  wave.strokeCap = "round";
+  wave.smooth();
+  let waveGroup = new Paper.Group();
+  for (let k = 0; k < 30; k++) {
+    let m = wave.clone();
+    m.position.x += 20 * k;
+    waveGroup.addChild(m);
+  }
+  wave.remove();
+  waveGroup.bounds.center.set(ref.center);
+  let offset = 0;
+  let forwardMvmnt = true;
+
+  waveGroup.children.map((wave, j) => {
+    // wave.onFrame = function() {
+    // this.segments.map((seg, i) => {
+    // console.log(this.bounds);
+    // let path = circlesGroup.children[i];
+    // console.log(this.bounds.point);
+    // if (offset == 0) {
+    //   forwardMvmnt = true;
+    // } else if (offset == Math.round(path.length) - 1) {
+    //   forwardMvmnt = false;
+    //   // offset--;
+    // }
+    // console.log(forwardMvmnt);
+    // if (forwardMvmnt == true) {
+    // this.bounds.point.set(path.getPointAt(offset));
+    // offset++;
+    // } else if (forwardMvmnt == false) {
+    // this.bounds.point.set(path.getPointAt(offset));
+    //   offset--;
+    // }
+    // });
+    // };
+  });
+};
 let randomPolygonCir = circle => {
   let offset = 10;
   let pt1 = new Paper.Point(
@@ -144,53 +247,91 @@ const rotatingWobble = ref => {
   path.closed = true;
   path.smooth();
   let rotationAngle = divisions <= 5 ? 5 : 2;
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 60; i++) {
     let clonedPath = path.clone();
     clonedPath.scale(0.2 * i);
     clonedPath.strokeColor = "white";
     clonedPath.strokeWidth = 0.1 * i;
 
-    // clonedPath.onFrame = function() {
-    // if (this.rotation <= 20) {
     clonedPath.rotation = rotationAngle * i;
-    // }
-
-    // console.log(this.getRotation());
-
-    // this.rotate(0.01 * i);
+    // clonedPath.dashArray = [5, 5, 5, 5, 5, 5];
+    // // clonedPath.dashOffset = 20;
+    // clonedPath.onFrame = function() {
+    //   this.dashOffset += 0.1 * i;
     // };
   }
 };
+const circlesOnPath = ref => {
+  let anchors = [];
+  for (let i = 0; i < 10; i++) {
+    let pt = new Paper.Point(ref.center.x + i * 30, ref.center.y + i * 50);
+    anchors.push(pt);
+  }
+  console.log(anchors);
 
-// blurrTest(ref);
+  anchors.map(point => {
+    point.x += getRandomInt(10, 100);
+  });
+
+  let path = new Paper.Path({
+    segments: anchors,
+    // strokeColor: "red",
+    strokeWidth: 2
+  });
+
+  path.bounds.center.set(ref.center);
+  path.smooth();
+
+  let divisions = 20;
+
+  for (let j = 0; j < divisions; j++) {
+    let cir = new Paper.Path.Circle(
+      path.getPointAt((path.length / divisions) * j),
+      10 * j
+    );
+    cir.fillColor = "red";
+    cir.fillColor.alpha = 0.2;
+  }
+};
+const circleLoop = ref => {
+  let anchors = [];
+  for (let i = 0; i < getRandomInt(5, 10); i++) {
+    let cir = new Paper.Path.Circle({
+      center: ref.center,
+      radius: i * 50,
+      // fillColor: "red",
+      opacity: 0.1
+    });
+    // anchors.push(cir.getPointAt(getRandomInt(0, cir.length - 1)));
+    anchors.push(cir.getPointAt((cir.length / getRandomInt(10, 20)) * i));
+  }
+  console.log(anchors);
+  let path = new Paper.Path({
+    segments: anchors,
+    strokeColor: "black",
+    // opacity: 0.5,
+    strokeCap: "round",
+    strokeWidth: 10
+  });
+
+  path.smooth();
+  let divs = 20;
+
+  for (let j = 0; j < divs; j++) {
+    let s = path.clone();
+    s.rotate((360 / divs) * j, ref.center);
+    s.onFrame = function() {
+      this.rotate(1);
+      // let canv = Paper.project.view.element;
+      // let ctx = canv.getContext("2d");
+      // encoder.addFrame(ctx);
+    };
+  }
+  path.remove();
+};
+
 // rotatingWobble(ref);
-
-let anchors = [];
-for (let i = 0; i < 10; i++) {
-  let pt = new Paper.Point(ref.center.x + i * 30, ref.center.y + i * 50);
-  anchors.push(pt);
-}
-console.log(anchors);
-
-anchors.map(point => {
-  point.x += getRandomInt(10, 500);
-});
-
-let path = new Paper.Path({
-  segments: anchors,
-  strokeColor: "red",
-  strokeWidth: 2
-});
-
-path.bounds.center.set(ref.center);
-path.smooth();
-
-let divisions = 20;
-
-for (let j = 0; j < divisions; j++) {
-  let cir = new Paper.Path.Circle(
-    path.getPointAt((path.length / divisions) * j),
-    50
-  );
-  cir.fillColor = "red";
-}
+// wavyLines(ref);
+// dashedCircles(ref);
+// circleLoop(ref);
+rotatedSmoothedPoly(ref);
