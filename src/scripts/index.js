@@ -14,6 +14,29 @@ let bg = new Paper.Path.Rectangle(new Paper.Point(0, 0), new Paper.Size(w, h));
 bg.fillColor = "#3B3561";
 
 let ref = Paper.project.view;
+
+// circle.bounds.topCenter.set(ref.bounds.topCenter);
+let circles = [];
+for (let i = 0; i < 10; i++) {
+	// let n = getRandomInt(20, 80);
+	let n = 20;
+	let circle = new Paper.Path.Circle({
+		radius: n,
+		center: ref.bounds.topCenter,
+		// radius: getRandomInt(30, 50),
+		// fillColor: "white",
+		strokeColor: "white",
+		strokeWidth: 2
+	});
+	circle.scale(getRandomArbitrary(0.2, 2));
+	circle.position.y += n * 2 * i;
+	// circles.push(circle);
+	// let cloneCir = circle.clone();
+	// cloneCir.scale(getRandomArbitrary(0.2, 1), cloneCir.bounds.topCenter);
+	// cloneCir.bounds.topCenter.set(circle.bounds.bottomCenter);
+	// cloneCir.position.y += cloneCir.bounds.height * 2;
+}
+
 const rotatingDots = ref => {
 	let rect = bg.clone();
 	rect.fillColor = null;
@@ -78,7 +101,6 @@ const createStars = ref => {
 		stars.addChild(star);
 	}
 };
-// createStars(ref);
 const circlesOnPath = ref => {
 	let anchors = [];
 	for (let i = 0; i < 10; i++) {
@@ -279,5 +301,35 @@ const rotatingGeomix = ref => {
 	}
 	path.remove();
 };
+const animatedGeomix = ref => {
+	let rotations = 500;
+	let sineN = getRandomInt(2, 100);
+	for (let i = 0; i < rotations; i++) {
+		let dot = new Paper.Path.Circle({
+			center: new Paper.Point(ref.center.x, ref.center.y + 200),
+			// fillColor: "white",
+			radius: 5,
+			strokeColor: "white",
+			strokeWidth: 4
+		});
+		// let height = getRandomInt(50,200);
+		let height = 300;
+		dot.onFrame = function(event) {
+			var sinus = Math.sin(event.time * 0.1 + i * sineN);
+			// var sinus = Math.sin(event.time * 0.5);
+			// let sinusSize = Math.sin(event.time );
+			// this.scale(sinusSize);
+			// this.scale(getRandomArbitrary(0.1, 1));
+			this.bounds.center = sinus * height + 540;
+			// this.bounds.scale(sinusSize)
+			// this.scale(sinusSize * 2 );
 
-rotatingDots(ref);
+			// console.log(sinusSize);
+			// this.scale(sinusSize);
+			// this.scal
+			// console.log(this.scale);
+			// this.rotate(1, ref.center);
+			dot.rotate((360 / rotations) * i, ref.center);
+		};
+	}
+};
