@@ -3,8 +3,8 @@ import Paper from "paper";
 import Kolor from "kolorwheel";
 import { getRandomInt, getRandomArbitrary, getRandomElement } from "./util";
 
-let w = 1080;
-let h = 1080;
+let w = 500;
+let h = 500;
 let canv = document.getElementById("canv");
 canv.setAttribute("width", w);
 canv.setAttribute("height", h);
